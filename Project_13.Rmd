@@ -53,61 +53,37 @@ upper_bound <- Q3 + 1.5 * IQR
 weather_data <- weather_data %>% filter(rain >= lower_bound & rain <= upper_bound)
 ```
 ##  Time Series Forecasting
-```{r}
 
-# Subset data for a specific location (e.g., Hanoi)
+```{r}
 data_subset <- weather_data %>% filter(province == "Hanoi")
 
-# Arrange data by date
-data_subset <- data_subset %>% arrange(date)
+# Convert data to time series
+ts_data <- ts(data_subset$max, start = c(year(min(data_subset$date)), month(min(data_subset$date))), frequency = 12) 
 
-# Create a time series object for maximum temperature
-temp_ts <- ts(data_subset$max, start = c(year(min(data_subset$date)), month(min(data_subset$date))), 
-              frequency = 12)  # Monthly data
+# Visualize time series
+plot.ts(ts_data, main = "Temperature Trends in Hanoi", ylab = "Temperature", xlab = "Time")
 
-# Plot the time series
-autoplot(temp_ts) + ggtitle("Maximum Temperature Time Series")
+# Apply forecasting model
+forecast_model <- auto.arima(ts_data)
+forecast_result <- forecast(forecast_model, h = 12)
 
-# Check for stationarity
-library(tseries)
-adf_test <- adf.test(temp_ts)  # Augmented Dickey-Fuller Test
-adf_test
-
-# Build an ARIMA model
-arima_model <- auto.arima(temp_ts)
-summary(arima_model)
-
-# Forecast the next 6 months
-forecast_values <- forecast(arima_model, h = 6)
-
-# Plot the forecast
-autoplot(forecast_values) + ggtitle("Temperature Forecast for Next 6 Months")
+# Plot forecast results
+plot(forecast_result)
 
 # Accuracy of the model
-accuracy(forecast_values)
-```
-
-## Step 5: Data Visualization
-``` {r}
-# Histogram of temperatures
-hist_max <- ggplot(weather_data, aes(x = max)) + geom_histogram(fill = "orange", bins = 30) +
-        ggtitle("Maximum Temperature Distribution")
-
-hist_min <- ggplot(weather_data, aes(x = min)) + geom_histogram(fill = "blue", bins = 30) +
-        ggtitle("Minimum Temperature Distribution")
-
-grid.arrange(hist_max, hist_min, ncol = 2)
+accuracy(forecast_result)
 ```
 
 
-## Step 6: Model Training and Prediction
+## Model Training and Prediction
+
 ```{r}
 # Preparing data
 set.seed(123)
 data <- weather_data %>% select(max, min, rain, humidi, wind, cloud, pressure)
 
 # Split data into training and testing
-trainIndex <- sample(seq_len(nrow(data)), size = 1000) 
+trainIndex <- sample(seq_len(nrow(data)), size = 500) 
 train_data <- data[trainIndex, ]
 test_data <- data[-trainIndex, ]
 
@@ -122,24 +98,22 @@ predictions <- predict(rf_model, test_data)
 # Evaluate accuracy
 RMSE <- sqrt(mean((predictions - test_data$max)^2))
 cat("RMSE:", RMSE)
+
 ```
+
+
 
 ## Automated Report Generation
 
 ```{r}
+
+if (sink.number() > 0) {
+  for (i in seq_len(sink.number())) {
+    sink(NULL)
+  }
+}
+
 # Generate an HTML report
 rmarkdown::render("Project_13.Rmd",'pdf_document')
 ```
 
-# Send email with the report
-
-```{r}
-from <- "hongnhung991022@gmail.com"
-to <- "nhungnth221099@gmail.com"
-subject <- "Vietnam weather forecast"
-body <- "The weather prediction report is attached."
-attachment <- "weather_report.html"
-
-smtp_server <- list(host.name = "smtp.gmail.com", port = 587, user.name = "hongnhung991022@gmail.com", passwd = "VieNh11541115", ssl = TRUE)
-sendmail(from, to, subject, body, control = smtp_server)
-```
