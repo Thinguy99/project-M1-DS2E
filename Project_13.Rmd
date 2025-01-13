@@ -134,16 +134,12 @@ rmarkdown::render("Project_13.Rmd",'pdf_document')
 # Send email with the report
 
 ```{r}
-send.mail(
-  from = "hongnhung991022@gmail.com",
-  to = "nhungnth221099@gmail.com",
-  subject = "Vietnam weather forecast",
-  body = "The weather prediction report is attached.",
-  smtp = list(host.name = "smtp.gmail.com", port = 587, 
-              user.name = "hongnhung991022@gmail.com", passwd = "Nhung1234@", ssl = TRUE),
-  attach.files = c("weather_report.html"),
-  authenticate = TRUE,
-  send = TRUE
-)
+from <- "hongnhung991022@gmail.com"
+to <- "nhungnth221099@gmail.com"
+subject <- "Vietnam weather forecast"
+body <- "The weather prediction report is attached."
+attachment <- "weather_report.html"
 
+smtp_server <- list(host.name = "smtp.gmail.com", port = 587, user.name = "hongnhung991022@gmail.com", passwd = "VieNh11541115", ssl = TRUE)
+sendmail(from, to, subject, body, control = smtp_server)
 ```
