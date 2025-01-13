@@ -5,9 +5,7 @@ date: "2025-01-10"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+
 
 ## R Markdown
 ## Load required libraries
@@ -20,7 +18,6 @@ library(randomForest)
 library(ggplot2)
 library(gridExtra)
 library(rmarkdown)
-library(sendmailR)
 library(forecast)
 ```
 
@@ -63,7 +60,7 @@ data_subset <- data_subset %>% arrange(date)
 
 # Create a time series object for maximum temperature
 temp_ts <- ts(data_subset$max, start = c(year(min(data_subset$date)), month(min(data_subset$date))), 
-              frequency = 12)  # Monthly data
+              frequency = 12) 
 
 # Plot the time series
 autoplot(temp_ts) + ggtitle("Maximum Temperature Time Series")
@@ -87,7 +84,7 @@ autoplot(forecast_values) + ggtitle("Temperature Forecast for Next 6 Months")
 accuracy(forecast_values)
 ```
 
-## Step 5: Data Visualization
+## Data Visualization
 ``` {r}
 # Histogram of temperatures
 hist_max <- ggplot(weather_data, aes(x = max)) + geom_histogram(fill = "orange", bins = 30) +
@@ -100,7 +97,7 @@ grid.arrange(hist_max, hist_min, ncol = 2)
 ```
 
 
-## Step 6: Model Training and Prediction
+## Model Training and Prediction
 ```{r}
 # Preparing data
 set.seed(123)
@@ -131,16 +128,4 @@ cat("RMSE:", RMSE)
 rmarkdown::render("Project_13.Rmd",'pdf_document')
 ```
 
-# Send email with the report
 
-```{r}
-from <- "hongnhung991022@gmail.com"
-to <- "nhungnth221099@gmail.com"
-subject <- "Vietnam weather forecast"
-body <- "The weather prediction report is attached."
-attachment <- "weather_report.html"
-
-smtp_server <- list(host.name = "smtp.gmail.com", port = 587, user.name = "hongnhung991022@gmail.com", passwd = "VieNh11541115", ssl = TRUE)
-sendmail(from, to, subject, body, control = smtp_server)
-
-```
