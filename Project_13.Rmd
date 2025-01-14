@@ -110,6 +110,13 @@ cat("RMSE:", RMSE)
 ## Automated Report Generation
 
 ```{r}
+
+if (sink.number() > 0) {
+  for (i in seq_len(sink.number())) {
+    sink(NULL)
+  }
+}
+
 # Generate an HTML report
 rmarkdown::render("Project_13.Rmd",'pdf_document')
 ```
